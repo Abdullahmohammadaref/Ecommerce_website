@@ -1,0 +1,88 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-6 order-1">
+                <h2>{{ listing.title}}</h2>
+            </div>
+            <div class="col-6 order-2">
+                <form method="POST" action="{% url 'listing' listing.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="wishlist">
+                    <input type="submit" class="btn btn-primary" value="{% if current_listing_in_watchlist %} Remove from watchlist {% else %} Add to watchlist{% endif %}">
+                </form>
+
+                {%  if current_user_id == listing_publisher_id %}
+                    <form method="POST" action="{% url 'listing' listing.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_type" value="close_listing">
+                        <input type="submit" class="btn btn-primary" value="Close Listing">
+                    </form>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-6 order1">
+                <div class="listing_item_picture  ratio-1x1">
+                    {% if listing.picture %}
+                        <img src="{{listing.picture}}" class="img_fluid h-100 w-100 mx-auto rounded object-fit-cover">
+                    {% else %}
+                        <img src="https://thumb.ac-illust.com/b1/b170870007dfa419295d949814474ab2_t.jpeg" class="img_fluid h-100 w-100 mx-auto rounded object-fit-cover">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-6 order2">
+                <h3>{{ listing.title }}</h3>
+                <br>
+                <h2>${{ listing.price }}</h2>
+                <br>
+                <p>{{ listing.description }}</p>
+                <br>
+                <p>status: {% if listing.closed == False %} Active {% else %} Closed {% endif %}</p>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            {% if "bid_error" in message.tags %}
+                <div class="alert alert-danger custom-bid-error">{{ message }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% if listing.closed == False %}
+    <form method="POST" action="{% url 'listing' listing.id %}">
+        {% csrf_token %}
+        <label for="price">Place Bidding:</label>
+        <input type="hidden" name="form_type" value="place_bidding">
+        <input type="number" id="price" name="price" placeholder="Bid">
+        <input type="submit" class="btn btn-primary" value="Place bidding">
+    </form>
+    {% elif listing.closed == True and current_user_id == listing_highest_bid.id %}
+        <p>You won the bidding</p>
+    {% endif %}
+
+    <form method="POST" action="{% url 'listing' listing.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="comment">
+        <label for="comment">comment:</label>
+        <textarea type="text" id="comment" name="comment" placeholder="comment"></textarea>
+        <input type="submit" class="btn btn-primary" value="comment">
+    </form>
+    <hr>
+    <hr>
+
+    <h3>Comments</h3>
+    {% for comment in comments %}
+        <h4>{{ comment.commentator }}</h4>
+        <p>{{ comment }}</p>
+        <hr>
+    {% endfor %}
+
+{% endblock %}

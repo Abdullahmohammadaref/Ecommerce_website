@@ -1,0 +1,32 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>
+        {% block body_title %}
+        {% endblock %}
+    </h2>
+    {% for listing in listings %}
+    <a class="text-decoration-none text-dark" href="{% url 'listing' listing.id %}">
+        <div class="container-fluid mt-4">
+            <div class="row">
+                <div class="col-6 order1">
+                    <div class="listing_item_picture  ratio-1x1">
+                        {% if listing.picture %}
+                            <img src="{{listing.picture}}" onerror="this.onerror=null; this.src='https://thumb.ac-illust.com/b1/b170870007dfa419295d949814474ab2_t.jpeg'" class="img_fluid h-100 w-100 mx-auto rounded object-fit-cover">
+                        {% else %}
+                            <img src="https://thumb.ac-illust.com/b1/b170870007dfa419295d949814474ab2_t.jpeg" class="img_fluid h-100 w-100 mx-auto rounded object-fit-cover">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-6 order2">
+                    <h3>{{ listing.title }}</h3>
+                    <br>
+                    <h2>${{ listing.price }}</h2>
+                    <br>
+                    <p>{{ listing.description }}</p>
+                </div>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+{% endblock %}
